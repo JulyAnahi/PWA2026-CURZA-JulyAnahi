@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trabajo Practico #1 - Vue.js | UNCo</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+      padding: 24px;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 8px;
+      font-size: 1.8rem;
+    }
+    .subtitulo {
+      text-align: center;
+      color: #7f8c8d;
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+    .tarjeta {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .tarjeta h2 {
+      font-size: 1.15rem;
+      color: #2980b9;
+      border-bottom: 2px solid #eaf2fb;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .grilla-perfil {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 6px 12px;
+      margin-bottom: 12px;
+    }
+    .grilla-perfil span:nth-child(odd) {
+      font-weight: 600;
+      color: #555;
+    }
+    .saludo {
+      background: #eaf2fb;
+      border-left: 4px solid #2980b9;
+      padding: 10px 14px;
+      border-radius: 4px;
+    }
+    .numero-contador {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #2c3e50;
+      text-align: center;
+      margin: 12px 0;
+    }
+    .grupo-botones {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    button {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: opacity 0.15s;
+    }
+    button:hover {
+      opacity: 0.85;
+    }
+    .boton-principal {
+      background: #2980b9;
+      color: #fff;
+    }
+    .boton-agregar {
+      background: #27ae60;
+      color: #fff;
+    }
+    .boton-quitar {
+      background: #e74c3c;
+      color: #fff;
+    }
+    .fila-nueva-tarea {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .fila-nueva-tarea input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+    .estadisticas-tareas {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    .etiqueta-estadistica {
+      background: #eaf2fb;
+      color: #2980b9;
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+    .lista-tareas {
+      list-style: none;
+    }
+    .lista-tareas li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 4px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .lista-tareas li:last-child {
+      border-bottom: none;
+    }
+    .lista-tareas input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+    .completada {
+      text-decoration: line-through;
+      color: #aaa;
+    }
+    .lista-eventos {
+      list-style: none;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .lista-eventos li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 4px;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 0.88rem;
+    }
+    .etiqueta-evento {
+      background: #f39c12;
+      color: #fff;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      min-width: 110px;
+      text-align: center;
+    }
+    .marca-tiempo {
+      color: #7f8c8d;
+      font-size: 0.82rem;
+    }
+    .contenedor-posts {
+      display: flex;
+      gap: 20px;
+    }
+    .columna-posts {
+      flex: 1;
+    }
+    .columna-comentarios {
+      flex: 1;
+    }
+    .elemento-post {
+      padding: 10px 14px;
+      border: 1px solid #dce3ea;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .elemento-post:hover {
+      background: #eaf2fb;
+      border-color: #2980b9;
+    }
+    .elemento-post.seleccionado {
+      background: #d6eaf8;
+      border-color: #2980b9;
+    }
+    .elemento-post h4 {
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+      color: #2c3e50;
+    }
+    .elemento-post p {
+      font-size: 0.8rem;
+      color: #7f8c8d;
+    }
+    .elemento-comentario {
+      padding: 10px 14px;
+      border: 1px solid #dce3ea;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      background: #fdfefe;
+    }
+    .elemento-comentario strong {
+      font-size: 0.85rem;
+      color: #2c3e50;
+    }
+    .elemento-comentario p {
+      font-size: 0.82rem;
+      color: #555;
+      margin-top: 4px;
+    }
+    .elemento-comentario .correo {
+      font-size: 0.78rem;
+      color: #2980b9;
+      margin-top: 2px;
+    }
+    .cargando {
+      color: #7f8c8d;
+      font-style: italic;
+      padding: 10px 0;
+    }
+    @media (max-width: 640px) {
+      .contenedor-posts {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+
+    <h1>Trabajo Practico #1 - Vue.js</h1>
+    <p class="subtitulo">Universidad Nacional del Comahue</p>
+
+    <div class="tarjeta">
+      <h2>Paso #2 - Informacion de Perfil Simple</h2>
+      <div class="grilla-perfil">
+        <span>Nombre:</span> <span>{{ nombre }}</span>
+        <span>Edad:</span>   <span>{{ edad }}</span>
+        <span>Ciudad:</span> <span>{{ ciudad }}</span>
+      </div>
+      <p class="saludo">
+        Hola, mi nombre es <strong>{{ nombre }}</strong>, tengo <strong>{{ edad }}</strong> años y vivo en <strong>{{ ciudad }}</strong>.
+      </p>
+    </div>
+
+    <div class="tarjeta">
+      <h2>Paso #3 - Contador Interactivo</h2>
+      <div class="numero-contador">Contador: {{ contador }}</div>
+      <div class="grupo-botones">
+        <button class="boton-agregar" @click="incrementar">Incrementar</button>
+        <button class="boton-quitar" @click="decrementar">Decrementar</button>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h2>Paso #4 - Lista de Tareas con Conteo y Estado</h2>
+      <div class="fila-nueva-tarea">
+        <input
+          type="text"
+          v-model="nuevaTarea"
+          placeholder="Escribir una nueva tarea..."
+          @keyup.enter="agregarTarea"
+        >
+        <button class="boton-principal" @click="agregarTarea">Añadir Tarea</button>
+      </div>
+
+      <div class="estadisticas-tareas">
+        <span class="etiqueta-estadistica">Total de Tareas: {{ totalTareas }}</span>
+        <span class="etiqueta-estadistica">Tareas Pendientes: {{ tareasPendientes }}</span>
+      </div>
+
+      <ul class="lista-tareas">
+        <li v-for="tarea in tareas" :key="tarea.id">
+          <input
+            type="checkbox"
+            :checked="tarea.completada"
+            @change="cambiarEstadoTarea(tarea)"
+          >
+          <span :class="{ completada: tarea.completada }">{{ tarea.texto }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="tarjeta">
+      <h2>Paso #5 - Lista de Eventos del Ciclo de Vida</h2>
+      <ul class="lista-eventos">
+        <li v-for="evento in listaEventos" :key="evento.id">
+          <span class="etiqueta-evento">{{ evento.nombre }}</span>
+          <span class="marca-tiempo">{{ evento.timestamp }} ms</span>
+        </li>
+      </ul>
+      <p v-if="listaEventos.length === 0" class="cargando">Sin eventos registrados aún...</p>
+    </div>
+
+    <div class="tarjeta">
+      <h2>Paso #6 &amp; #7 - Posts y Comentarios (Axios)</h2>
+      <div v-if="cargandoPosts" class="cargando">Cargando posts...</div>
+      <div class="contenedor-posts" v-else>
+        <div class="columna-posts">
+          <h3 style="margin-bottom: 10px; color: #555; font-size: 0.95rem;">Posts del 1 al 10</h3>
+          <div
+            v-for="post in listaDePosts"
+            :key="post.id"
+            class="elemento-post"
+            :class="{ seleccionado: postActual && postActual.id === post.id }"
+            @click="mostrarComentarios(post)"
+          >
+            <h4>#{{ post.id }} - {{ post.titulo }}</h4>
+            <p>{{ post.cuerpo }}</p>
+          </div>
+        </div>
+
+        <div class="columna-comentarios">
+          <h3 style="margin-bottom: 10px; color: #555; font-size: 0.95rem;">
+            <span v-if="postActual">Comentarios del Post #{{ postActual.id }}</span>
+            <span v-else>Selecciona un post para ver sus comentarios</span>
+          </h3>
+
+          <div v-if="cargandoComentarios" class="cargando">Cargando comentarios...</div>
+          <div v-else>
+            <div
+              v-for="comentario in listaDeComentarios"
+              :key="comentario.id"
+              class="elemento-comentario"
+            >
+              <strong>{{ comentario.name }}</strong>
+              <p class="correo">{{ comentario.email }}</p>
+              <p>{{ comentario.body }}</p>
+            </div>
+            <p v-if="postActual && listaDeComentarios.length === 0" class="cargando">
+              Este post no tiene comentarios.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    var instanciaAxios = null;
+    if (typeof axios !== 'undefined') {
+      instanciaAxios = axios.create({
+        baseURL: 'https://jsonplaceholder.typicode.com',
+        timeout: 10000
+      });
+    }
+
+    async function obtenerPost(postId) {
+      if (instanciaAxios) {
+        var respuesta = await instanciaAxios.get('/posts/' + postId);
+        return respuesta.data;
+      } else {
+        var res = await fetch('https://jsonplaceholder.typicode.com/posts/' + postId);
+        return await res.json();
+      }
+    }
+
+    async function obtenerComments(postId) {
+      if (instanciaAxios) {
+        var respuesta = await instanciaAxios.get('/posts/' + postId + '/comments');
+        return respuesta.data;
+      } else {
+        var res = await fetch('https://jsonplaceholder.typicode.com/posts/' + postId + '/comments');
+        return await res.json();
+      }
+    }
+
+    var obtenerComentarios = obtenerComments;
+
+    new Vue({
+      el: '#app',
+      data: {
+        nombre: 'Ana García',
+        edad: 30,
+        ciudad: 'Tupungato',
+
+        contador: 0,
+
+        nuevaTarea: '',
+        tareas: [
+          { id: 1, texto: 'Aprender Vue', completada: false }
+        ],
+        siguienteId: 2,
+
+        listaEventos: [],
+        contadorDeEventos: 0,
+
+        listaDePosts: [],
+        listaDeComentarios: [],
+        postActual: null,
+        cargandoPosts: true,
+        cargandoComentarios: false
+      },
+      computed: {
+        tareasPendientes: function() {
+          return this.tareas.filter(function(tarea) {
+            return !tarea.completada;
+          }).length;
+        },
+        totalTareas: function() {
+          return this.tareas.length;
+        }
+      },
+      methods: {
+        incrementar: function() {
+          this.contador++;
+        },
+        decrementar: function() {
+          this.contador--;
+        },
+        agregarTarea: function() {
+          var texto = this.nuevaTarea.trim();
+          if (!texto) return;
+          this.tareas.push({
+            id: this.siguienteId++,
+            texto: texto,
+            completada: false
+          });
+          this.nuevaTarea = '';
+        },
+        cambiarEstadoTarea: function(tarea) {
+          tarea.completada = !tarea.completada;
+        },
+        registrarEvento: function(nombre) {
+          this.contadorDeEventos++;
+          this.listaEventos.push({
+            id: this.contadorDeEventos,
+            nombre: nombre,
+            timestamp: Date.now()
+          });
+        },
+        mostrarComentarios: async function(post) {
+          this.postActual = post;
+          this.listaDeComentarios = [];
+          this.cargandoComentarios = true;
+          try {
+            this.listaDeComentarios = await obtenerComments(post.id);
+          } catch (error) {
+            console.error(error);
+          } finally {
+            this.cargandoComentarios = false;
+          }
+        }
+      },
+      beforeCreate: function() {},
+      created: function() {
+        this.registrarEvento('beforeCreate');
+        this.registrarEvento('created');
+      },
+      beforeMount: function() {
+        this.registrarEvento('beforeMount');
+      },
+      mounted: function() {
+        var self = this;
+        self.registrarEvento('mounted');
+
+        var peticiones = [];
+        for (var i = 1; i <= 10; i++) {
+          peticiones.push(obtenerPost(i));
+        }
+
+        Promise.all(peticiones)
+          .then(function(resultados) {
+            self.listaDePosts = resultados.map(function(post) {
+              return {
+                id: post.id,
+                titulo: post.title,
+                cuerpo: post.body
+              };
+            });
+          })
+          .catch(function(error) {
+            console.error(error);
+          })
+          .finally(function() {
+            self.cargandoPosts = false;
+          });
+      },
+      beforeUpdate: function() {
+        if (this._actualizandoBeforeUpdate) return;
+        this._actualizandoBeforeUpdate = true;
+        this.registrarEvento('beforeUpdate');
+        var self = this;
+        setTimeout(function() {
+          self._actualizandoBeforeUpdate = false;
+        }, 100);
+      },
+      updated: function() {
+        if (this._actualizandoUpdated) return;
+        this._actualizandoUpdated = true;
+        this.registrarEvento('updated');
+        var self = this;
+        setTimeout(function() {
+          self._actualizandoUpdated = false;
+        }, 100);
+      },
+      beforeDestroy: function() {
+        this.registrarEvento('beforeDestroy');
+      },
+      destroyed: function() {
+        this.registrarEvento('destroyed');
+      }
+    });
+  </script>
+</body>
+</html>
